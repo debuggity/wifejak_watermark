@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>💖 Watermark Your Image 💖</title>
+    <style>
+        body {
+            background-color: #ffe6f2;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            color: #ff69b4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        /* Upload Button Styling */
+        .upload-container {
+            margin: 20px auto;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin: 0 auto;
+            font-size: 16px;
+            padding: 10px;
+            background-color: #ffb6c1;
+            border: 2px solid #ff69b4;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            overflow: hidden; /* Prevent extra content from appearing */
+            width: 200px; /* Fixed width for consistency */
+        }
+
+        /* Hide the default file upload button */
+        input[type="file"]::-webkit-file-upload-button {
+            display: none;
+        }
+
+        input[type="file"]::before {
+            content: '💖 Upload Image 💖';
+            display: block;
+            background: #ff69b4;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        input[type="file"]:hover::before {
+            background-color: #ff1493;
+        }
+
+        /* Canvas Styling */
+        #canvas-container {
+            position: relative;
+            margin: 20px auto;
+            border: 5px solid #ffb6c1;
+            border-radius: 15px;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        canvas {
+            max-width: 90vw;
+            max-height: 60vh;
+            display: block;
+        }
+
+        /* Controls Styling */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .controls div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-weight: bold;
+            color: #ff69b4;
+            margin-bottom: 5px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 200px;
+            height: 8px;
+            border-radius: 5px;
+            background: #ffb6c1;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff69b4;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff69b4;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+
+        /* Download Button Styling */
+        #downloadBtn {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        #downloadBtn:hover {
+            background-color: #ff1493;
+        }
+
+        /* Watermark Options */
+        .watermark-options {
+            margin-top: 20px;
+        }
+
+        .watermark-options img {
+            width: 100px;
+            cursor: pointer;
+            margin: 5px;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .watermark-options img:hover {
+            transform: scale(1.05);
+        }
+
+        .selected {
+            border-color: #ff69b4;
+        }
+
+        /* Heart Divider */
+        .heart-divider {
+            margin: 30px auto;
+            width: 50%;
+            height: 1px;
+            background: url('heart-divider.png') repeat-x center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .slider {
+                width: 150px;
+            }
+
+            .watermark-options img {
+                width: 80px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <h1>💖 Watermark Your Image 💖</h1>
+
+    <!-- Upload Button -->
+    <div class="upload-container">
+        <input type="file" id="imageLoader" name="imageLoader" accept="image/*"/>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-container">
+        <canvas id="imageCanvas"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div>
+            <label for="scaleSlider">Scale:</label>
+            <input type="range" id="scaleSlider" class="slider" min="0.5" max="1.5" value="1" step="0.1">
+        </div>
+        <div>
+            <label for="rotationSlider">Rotation:</label>
+            <input type="range" id="rotationSlider" class="slider" min="-180" max="180" value="0" step="1">
+        </div>
+    </div>
+
+    <!-- Download Button -->
+    <button id="downloadBtn">Download Your Image</button>
+
+    <div class="heart-divider"></div>
+
+    <!-- Watermark Options -->
+    <div class="watermark-options">
+        <h2>Select a Watermark</h2>
+        <img src="wifejak_ticker.png" id="watermark1" class="selected">
+        <img src="wifejak_ticker_blue_outline.png" id="watermark2">
+        <img src="wifejak_ticker_white_outline.png" id="watermark3">
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
