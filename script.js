@@ -38,6 +38,51 @@ canvas.addEventListener('mousemove', handleMouseMove, false);
 canvas.addEventListener('mouseup', handleMouseUp, false);
 canvas.addEventListener('mouseout', handleMouseUp, false);
 
+// Add touch event listeners for mobile support
+canvas.addEventListener('touchstart', handleTouchStart, false);
+canvas.addEventListener('touchmove', handleTouchMove, false);
+canvas.addEventListener('touchend', handleTouchEnd, false);
+
+// Convert touch events to mouse-like events
+function handleTouchStart(e) {
+    if (!uploadedImage.src) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mousePos = getMousePos(canvas, touch);
+    const wmWidth = watermarkImage.width * baseScale * scale;
+    const wmHeight = watermarkImage.height * baseScale * scale;
+
+    ctx.save();
+    ctx.translate(watermarkX, watermarkY);
+    ctx.rotate(rotation * Math.PI / 180);
+    ctx.beginPath();
+    ctx.rect(-wmWidth / 2, -wmHeight / 2, wmWidth, wmHeight);
+    ctx.restore();
+
+    if (ctx.isPointInPath(mousePos.x, mousePos.y)) {
+        isDragging = true;
+        offsetX = mousePos.x - watermarkX;
+        offsetY = mousePos.y - watermarkY;
+    }
+}
+
+function handleTouchMove(e) {
+    if (isDragging) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mousePos = getMousePos(canvas, touch);
+        watermarkX = mousePos.x - offsetX;
+        watermarkY = mousePos.y - offsetY;
+        drawCanvas();
+    }
+}
+
+function handleTouchEnd(e) {
+    if (isDragging) {
+        isDragging = false;
+    }
+}
+
 // Functions
 function handleImageUpload(e) {
     const reader = new FileReader();
